@@ -18,7 +18,7 @@ With its advanced image-based representations and flexible usability, DEEPScreen
 Run the script:
    
    ```bash
-   python bin/main_training.py --target_chembl_id "CHEMBL286" --assay_type "B" --pchembl_threshold 6.0 --output_file "activity_data.csv"
+   python main_training.py --target_chembl_id "CHEMBL286" --assay_type "B" --pchembl_threshold 6.0 --output_file "activity_data.csv"
    ```
 
 This will download and split the data and train the model using it.
