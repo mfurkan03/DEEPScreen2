@@ -15,12 +15,6 @@ With its advanced image-based representations and flexible usability, DEEPScreen
   pip install requests pandas
   ```
 ## Usage
-**Navigate to the bin directory:**
-
-   ```bash
-   cd bin
-   ```
-
 Run the script:
    
    ```bash
