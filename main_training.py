@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from train_deepscreen import train_validation_test_training
 from data_processing import create_final_randomized_training_val_test_sets
 from chembl_downloading import download_target
@@ -100,17 +101,27 @@ parser.add_argument(
     '--smiles_input_file',
     type=str,
     help="Path to txt file containing ChEMBL IDs")
+parser.add_argument(
+    '--training_dir',
+    type=str,
+    default='training_files/target_training_datasets',
+    help='Path to training datasets directory (default: training_files/target_training_datasets)')
 
 if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
-    target_training_dataset_path = "/home/atabey/DEEPScreen2/training_files/target_training_datasets"
+    
+    # Create platform-independent path
+    target_training_dataset_path = Path(args.training_dir).resolve()
+    # Ensure directory exists
+    target_training_dataset_path.mkdir(parents=True, exist_ok=True)
 
     download_target(args)
-    create_final_randomized_training_val_test_sets(f"{target_training_dataset_path}/{args.target_chembl_id}/activity_data.csv", 
-                                                args.max_cores, 
-                                                args.target_chembl_id,
-                                                target_training_dataset_path, 
-                                                args.pchembl_threshold)
+    create_final_randomized_training_val_test_sets(
+        target_training_dataset_path / args.target_chembl_id / "activity_data.csv",
+        args.max_cores,
+        args.target_chembl_id,
+        target_training_dataset_path,
+        args.pchembl_threshold)
     train_validation_test_training(args.target_chembl_id, args.model, args.fc1, args.fc2, args.lr, args.bs,
                                    args.dropout, args.epoch, args.en, args.cuda)

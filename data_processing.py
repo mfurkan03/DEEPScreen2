@@ -1,29 +1,23 @@
 # data_processing.py
 
 import os
-import sys
 import cv2
 import json
-import torch
 import random
 import warnings
-import subprocess
 import numpy as np
 import pandas as pd
-from operator import itemgetter
 from torch.utils.data import Dataset
-from torch.utils.data.sampler import SubsetRandomSampler, BatchSampler, SequentialSampler
+from torch.utils.data.sampler import SubsetRandomSampler
 from rdkit import Chem
 from rdkit.Chem import Draw
 from concurrent.futures import ProcessPoolExecutor
 import time
-import argparse
 import multiprocessing
 import csv
 from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
-import chemprop
-from chemprop.data import SplitType, make_split_indices,split_data_by_indices
-from chemprop.data import MoleculeDatapoint
+from chemprop.data import make_split_indices
+
 warnings.filterwarnings(action='ignore')
 current_path_beginning = os.getcwd().split("DEEPScreen")[0]
 current_path_version = os.getcwd().split("DEEPScreen")[1].split("/")[0]
