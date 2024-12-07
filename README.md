@@ -60,7 +60,7 @@ python main_training.py \
     --pchembl_threshold 5.8 
 ```
 
-### Step 2: Making Predictions
+### Step 2: Making Predictions (usecase: viral DNA polymerase model)
 After training, you can make predictions using:
 
 ```bash
