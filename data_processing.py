@@ -103,7 +103,7 @@ def process_smiles(smiles_data):
                 local_dict[test_val_train_situation].append([compound_id + "_" + str(i), int(act_inact)])
                 #print(local_dict[test_val_train_situation].append([compound_id + "_" + str(i), int(act_inact)]))
         else:
-            print("( Skipped ) SMILES can not converted to image: ", compound_id)
+            print(compound_id," cannot create image")
     except:
         print(compound_id , targetid)
         pass
@@ -167,9 +167,9 @@ def get_act_inact_list_for_all_targets(fl):
     act_inact_dict = dict()
     with open(fl) as f:
         for line in f:
-            if line.strip() != "":
+            if line.strip() != "":  # Satırın boş olmadığından emin ol
                 parts = line.strip().split("\t")
-                if len(parts) == 2:  
+                if len(parts) == 2:  # Satırın doğru şekilde ayrıştırıldığından emin ol
                     chembl_part, comps = parts
                     chembl_target_id, act_inact = chembl_part.split("_")
                     if act_inact == "act":
@@ -306,7 +306,7 @@ def create_act_inact_files_similarity_based_neg_enrichment_threshold(act_inact_f
     act_inact_count_fl.close()
     act_inact_comp_fl.close()
 
-def create_final_randomized_training_val_test_sets(activity_data,max_cores,scaffold,targetid,target_prediction_dataset_path,moleculenet ,pchembl_threshold=6):
+def create_final_randomized_training_val_test_sets(activity_data,max_cores,scaffold,targetid,target_prediction_dataset_path,moleculenet ,pchembl_threshold):
 
     
     
@@ -314,66 +314,29 @@ def create_final_randomized_training_val_test_sets(activity_data,max_cores,scaff
 
         pandas_df = pd.read_csv(activity_data)
 
-        #pandas_df = pandas_df.head(200) #HERE , you can run the code for preview
+        pandas_df = pandas_df.head(200) #HERE , you can run the code for preview
         
-        print(pandas_df.columns)
+        
+        pandas_df.rename(columns={pandas_df.columns[0]: "canonical_smiles", pandas_df.columns[-1]: "target"}, inplace=True)
+        pandas_df = pandas_df[["canonical_smiles", "target"]]
+        
+        #pandas_df["molecule_chembl_id"] = [f"HIV{i+1}" for i in range(len(pandas_df))]
 
-        if("HIV_active" in pandas_df.columns):
-            print("HIV")
+        pandas_df["molecule_chembl_id"] = [f"{targetid}{i+1}" for i in range(len(pandas_df))]
 
-            print(pandas_df.dtypes)
-            pandas_df["molecule_chembl_id"] = [f"HIV{i+1}" for i in range(len(pandas_df))]
-            pandas_df["canonical_smiles"] = pandas_df["smiles"]
-            act_ids = pandas_df[pandas_df["HIV_active"] == 1]["molecule_chembl_id"].tolist()
-            inact_ids = pandas_df[pandas_df["HIV_active"] == 0]["molecule_chembl_id"].tolist()
-            act_inact_dict = {targetid: [act_ids, inact_ids]}
-            print("act len" , len(act_ids))
-            print("inact len" , len(inact_ids))
+        act_ids = pandas_df[pandas_df["target"] == 1]["molecule_chembl_id"].tolist()
+        inact_ids = pandas_df[pandas_df["target"] == 0]["molecule_chembl_id"].tolist()
+        act_inact_dict = {targetid: [act_ids, inact_ids]}
+        
 
-            moleculenet_dict = {}
-            for i, row_ in pandas_df.iterrows():
-                cid = row_["molecule_chembl_id"]
-                smi = row_["canonical_smiles"]
-                moleculenet_dict[cid] = ["dummy1", "dummy2", "dummy3", smi]
-            chemblid_smiles_dict = moleculenet_dict
+        moleculenet_dict = {}
+        for i, row_ in pandas_df.iterrows():
+            cid = row_["molecule_chembl_id"]
+            smi = row_["canonical_smiles"]
+            moleculenet_dict[cid] = ["dummy1", "dummy2", "dummy3", smi]
+        chemblid_smiles_dict = moleculenet_dict
             
-        elif("p_np" in pandas_df.columns):
-
-            print("BBBP")
-            pandas_df["molecule_chembl_id"] = pandas_df["name"]
-            pandas_df["canonical_smiles"] = pandas_df["smiles"]
-            act_ids = pandas_df[pandas_df["p_np"] == 1]["molecule_chembl_id"].tolist()
-            inact_ids = pandas_df[pandas_df["p_np"] == 0]["molecule_chembl_id"].tolist()
-            act_inact_dict = {targetid: [act_ids, inact_ids]}
-
-            moleculenet_dict = {}
-            for i, row_ in pandas_df.iterrows():
-                cid = row_["molecule_chembl_id"]
-                smi = row_["canonical_smiles"]
-                moleculenet_dict[cid] = ["dummy1", "dummy2", "dummy3", smi]
-            chemblid_smiles_dict = moleculenet_dict
-        
-        elif("mol" in pandas_df.columns):
-
-            print("BACE")
-
-            pandas_df["molecule_chembl_id"] = pandas_df["CID"]
-            pandas_df["canonical_smiles"] = pandas_df["mol"]
-            act_ids = pandas_df[pandas_df["Class"] == 1]["molecule_chembl_id"].tolist()
-            inact_ids = pandas_df[pandas_df["Class"] == 0]["molecule_chembl_id"].tolist()
-            act_inact_dict = {targetid: [act_ids, inact_ids]}
-
-            moleculenet_dict = {}
-            for i, row_ in pandas_df.iterrows():
-                cid = row_["molecule_chembl_id"]
-                smi = row_["canonical_smiles"]
-                moleculenet_dict[cid] = ["dummy1", "dummy2", "dummy3", smi]
-            chemblid_smiles_dict = moleculenet_dict
-        
-        else:
-
-            print("Usage of different datasets")
-    
+     
     else:
     
         chemblid_smiles_dict = get_chemblid_smiles_inchi_dict(activity_data) 
