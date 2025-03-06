@@ -196,7 +196,7 @@ def fetch_all_protein_targets():
     return targets
 
 def download_target(args):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     target_chembl_ids = []
     
     if args.all_proteins:
@@ -213,7 +213,7 @@ def download_target(args):
     for chembl_id in target_chembl_ids:
         output_dir = os.path.join(base_dir, 'training_files', 'target_training_datasets', chembl_id)
         output_path = os.path.join(output_dir, args.output_file)
-        
+
         if os.path.exists(output_path):
             print(f"File {output_path} already exists. Skipping download.")
             continue

@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description='DEEPScreen arguments')
 parser.add_argument(
     '--target_chembl_id',
     type=str,
-    default="CHEMBL2051",
+    default="CHEMBL4282",
     metavar='TID',
     help='Target ChEMBL ID')
 parser.add_argument(
@@ -20,7 +20,7 @@ parser.add_argument(
 parser.add_argument(
     '--fc1',
     type=int,
-    default=512,
+    default=128,
     metavar='FC1',
     help='number of neurons in the first fully-connected layer (default:512)')
 parser.add_argument(
@@ -50,7 +50,7 @@ parser.add_argument(
 parser.add_argument(
     '--epoch',
     type=int,
-    default=100,
+    default=2,
     metavar='EPC',
     help='Number of epochs (default: 100)')
 parser.add_argument(

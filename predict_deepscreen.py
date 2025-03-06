@@ -130,7 +130,7 @@ def predict(model_path, smiles_file, target_id, batch_size=32, cuda_selection=0,
         }
     
     # Save predictions
-    output_file = f"{target_prediction_dataset_path}/{target_id}/predictions_4active.json"
+    output_file = f"{target_prediction_dataset_path}/{target_id}/predictions.json"
     with open(output_file, 'w') as f:
         json.dump(predictions, f, indent=2)
     

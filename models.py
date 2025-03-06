@@ -53,3 +53,14 @@ class CNNModel1(nn.Module):
         return x
 
 # TODO: Create other models
+
+class ViT(nn.Module):
+    def __init__(self, num_classes: int = 2, drop_rate: float = 0.1):
+        super(ViT, self).__init__()
+        self.vit = ViT(
+            image_size = 224,
+            
+        )
+
+    def forward(self, x):
+        return self.vit(x)

@@ -71,3 +71,33 @@ python predict_deepscreen.py \
 ```
 
 Note: All necessary files are included in the repository. The files under `DEEPScreen2/monkeypox/` contain the published results.
+
+
+# DrugGEN Use-Case Guide
+
+
+## Running the Model
+
+### Step 1: Training
+To train the model with our pre-configured settings, run:
+
+```bash
+python main_training.py \
+    --target_chembl_id CHEMBL4282 \
+    --lr 0.001 \
+    --dropout 0.3 \
+    --epoch 20 \
+    --pchembl_threshold 6.0
+```
+
+### Step 2: Making Predictions (usecase: DrugGEN molecules)
+After training, you can make predictions using:
+
+```bash
+python predict_deepscreen.py \
+    --model_path trained_models/deepscreen_scaffold_balanced/CHEMBL4282_best_val-CHEMBL4282-CNNModel1-512-256-0.001-256-0.3-20-deepscreen_scaffold_balanced_lr0.001_drop0.3_bs256-state_dict.pth \
+    --smiles_file prediction_files/DrugGEN_generated_molecules.csv \
+    --target_id DrugGEN
+```
+
+Note: All necessary files are included in the repository. The files under `DEEPScreen2/druggen/` contain the published results.
