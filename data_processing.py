@@ -344,7 +344,7 @@ def create_final_randomized_training_val_test_sets(activity_data,max_cores,scaff
     
         create_act_inact_files_for_targets(activity_data, targetid, "chembl", pchembl_threshold,scaffold, target_prediction_dataset_path) 
 
-        act_inact_dict = get_act_inact_list_for_all_targets(os.path.join(target_prediction_dataset_path,targetid,"chembl","_preprocessed_filtered_act_inact_comps_pchembl_",pchembl_threshold))
+        act_inact_dict = get_act_inact_list_for_all_targets(os.path.join(target_prediction_dataset_path,targetid,"chembl"+"_preprocessed_filtered_act_inact_comps_pchembl_"+str(pchembl_threshold)+".tsv"))
 
         #print(act_inact_dict)
 
