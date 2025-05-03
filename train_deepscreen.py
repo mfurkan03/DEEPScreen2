@@ -140,6 +140,8 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     best_val_test_performance_dict = dict()
     best_val_test_performance_dict["MCC"] = 0.0
 
+    global_step = 0  # Track steps across all epochs
+
     for epoch in range(n_epoch):
         total_training_count = 0
         total_training_loss = 0.0
@@ -150,26 +152,31 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         all_training_preds = []
         all_training_probs = []
         print("Training mode:", model.training)
-       
+
         for i, data in enumerate(train_loader):
             batch_number += 1
             optimizer.zero_grad()
             img_arrs, labels, comp_ids = data
-            img_arrs, labels = torch.tensor(img_arrs).type(torch.FloatTensor).to(device), torch.tensor(labels).to(device)
+            img_arrs = torch.tensor(img_arrs).type(torch.FloatTensor).to(device)
+            labels = torch.tensor(labels).to(device)
 
             total_training_count += len(comp_ids)
-            
+
             y_pred = model(img_arrs).to(device)
             _, preds = torch.max(y_pred, 1)
             all_training_labels.extend(list(labels.detach().cpu().numpy()))
             all_training_preds.extend(list(preds.detach().cpu().numpy()))
             all_training_probs.extend(y_pred.detach().cpu().numpy())
 
-
             loss = criterion(y_pred, labels)
             total_training_loss += float(loss.item())
             loss.backward()
             optimizer.step()
+
+            # ✅ Wandb log at every step
+            wandb.log({"Loss/train_step": loss.item(), "step": global_step})
+
+            global_step += 1  # Increment global step
             
         print("Epoch {} training loss:".format(epoch), total_training_loss)
         
