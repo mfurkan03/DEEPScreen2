@@ -1,4 +1,5 @@
 # data_processing.py
+from PIL import Image
 
 import os
 import cv2
@@ -20,12 +21,12 @@ from chemprop.data import make_split_indices
 
 warnings.filterwarnings(action='ignore')
 current_path_beginning = os.getcwd().split("DEEPScreen")[0]
-current_path_version = os.getcwd().split("DEEPScreen")[1].split("/")[0]
+current_path_version = os.getcwd().split("DEEPScreen")[1].split(os.sep)[0]
 
-project_file_path = "{}DEEPScreen{}".format(current_path_beginning, current_path_version)
-training_files_path = "{}/training_files".format(project_file_path)
-result_files_path = "{}/result_files".format(project_file_path)
-trained_models_path = "{}/trained_models".format(project_file_path)
+project_file_path = os.path.join(current_path_beginning,"DEEPScreen"+current_path_version)
+training_files_path = os.path.join(project_file_path,"training_files")
+result_files_path = os.path.join(project_file_path,"result_files")
+trained_models_path = os.path.join(project_file_path,"trained_models")
 
 IMG_SIZE = 300
 
@@ -38,10 +39,10 @@ def get_chemblid_smiles_inchi_dict(smiles_inchi_fl):
 def save_comp_imgs_from_smiles(tar_id, comp_id, smiles, rotations, target_prediction_dataset_path, SIZE=300, rot_size=300):
     
     mol = Chem.MolFromSmiles(smiles)
-    
     if mol is None:
         print(f"Invalid SMILES: {smiles}")
         return
+    
     """
     Draw.DrawingOptions.atomLabelFontSize = 55
     
@@ -49,7 +50,7 @@ def save_comp_imgs_from_smiles(tar_id, comp_id, smiles, rotations, target_predic
     
     Draw.DrawingOptions.bondLineWidth = 1.5
     """
-    
+
     base_path = os.path.join(target_prediction_dataset_path, tar_id, "imgs")
     
     if not os.path.exists(base_path):
@@ -74,7 +75,7 @@ def save_comp_imgs_from_smiles(tar_id, comp_id, smiles, rotations, target_predic
                 full_image = image_bgr
 
             path_to_save = os.path.join(base_path, f"{comp_id}{suffix}.png")
-            #print(path_to_save)
+
             cv2.imwrite(path_to_save, full_image)
     except Exception as e:
         print(f"Error creating PNG for {comp_id}: {e}")
@@ -136,7 +137,7 @@ def generate_images(smiles_file, targetid, max_cores,tar_train_val_test_dict,tar
     print(f"Total images generated: {total_image_count}")
 
 def get_uniprot_chembl_sp_id_mapping(chembl_uni_prot_mapping_fl):
-    id_mapping_fl = open("{}/{}".format(training_files_path, chembl_uni_prot_mapping_fl))
+    id_mapping_fl = open(os.path.join(training_files_path, chembl_uni_prot_mapping_fl))
     lst_id_mapping_fl = id_mapping_fl.read().split("\n")
     id_mapping_fl.close()
     uniprot_to_chembl_dict = dict()
@@ -150,7 +151,7 @@ def get_uniprot_chembl_sp_id_mapping(chembl_uni_prot_mapping_fl):
     return uniprot_to_chembl_dict
 
 def get_chembl_uniprot_sp_id_mapping(chembl_mapping_fl):
-    id_mapping_fl = open("{}/{}".format(training_files_path, chembl_mapping_fl))
+    id_mapping_fl = open(os.path.join(training_files_path, chembl_mapping_fl))
     lst_id_mapping_fl = id_mapping_fl.read().split("\n")
     id_mapping_fl.close()
     chembl_to_uniprot_dict = dict()
@@ -245,7 +246,7 @@ def create_act_inact_files_similarity_based_neg_enrichment_threshold(act_inact_f
     
 
     seq_to_other_seqs_score_dict = dict()
-    with open("{}/{}".format(training_files_path, blast_sim_fl)) as f:
+    with open(os.path.join(training_files_path, blast_sim_fl)) as f:
         for line in f:
             parts = line.split("\t")
             u_id1, u_id2, score = parts[0].split("|")[1], parts[1].split("|")[1], float(parts[2])
@@ -283,8 +284,8 @@ def create_act_inact_files_similarity_based_neg_enrichment_threshold(act_inact_f
                         pass
         new_all_act_inact_dict[chembl_target_id] = [target_act_list, target_inact_list]
 
-    act_inact_comp_fl = open("{}/{}_blast_comp_{}.txt".format(training_files_path, act_inact_fl.split(".tsv")[0], sim_threshold), "w")
-    act_inact_count_fl = open("{}/{}_blast_count_{}.txt".format(training_files_path, act_inact_fl.split(".tsv")[0], sim_threshold), "w")
+    act_inact_comp_fl = open(os.path.join(training_files_path,act_inact_fl.split(".tsv")[0],"_blast_comp_",sim_threshold), "w")
+    act_inact_count_fl = open(os.path.join(training_files_path,act_inact_fl.split(".tsv")[0],"_blast_count_",sim_threshold), "w")
 
     for targ in new_all_act_inact_dict.keys():
         if len(new_all_act_inact_dict[targ][0])>=data_point_threshold and len(new_all_act_inact_dict[targ][1])>=data_point_threshold:
@@ -343,7 +344,7 @@ def create_final_randomized_training_val_test_sets(activity_data,max_cores,scaff
     
         create_act_inact_files_for_targets(activity_data, targetid, "chembl", pchembl_threshold,scaffold, target_prediction_dataset_path) 
 
-        act_inact_dict = get_act_inact_list_for_all_targets("{}/{}/{}_preprocessed_filtered_act_inact_comps_pchembl_{}.tsv".format(target_prediction_dataset_path, targetid, "chembl", pchembl_threshold))
+        act_inact_dict = get_act_inact_list_for_all_targets(os.path.join(target_prediction_dataset_path,targetid,"chembl","_preprocessed_filtered_act_inact_comps_pchembl_",pchembl_threshold))
 
         #print(act_inact_dict)
 
@@ -384,7 +385,7 @@ def create_final_randomized_training_val_test_sets(activity_data,max_cores,scaff
         tar_train_val_test_dict["test"] = []
     
 
-        directory = "{}/{}".format(target_prediction_dataset_path,targetid)
+        directory = os.path.join(target_prediction_dataset_path,targetid)
 
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -511,7 +512,7 @@ class DEEPScreenDataset(Dataset):
     def __init__(self, target_id, train_val_test):
         self.target_id = target_id
         self.train_val_test = train_val_test
-        self.training_dataset_path = "{}/target_training_datasets/{}".format(training_files_path, target_id)
+        self.training_dataset_path = os.path.join(training_files_path,"target_training_datasets",target_id)
         self.train_val_test_folds = json.load(open(os.path.join(self.training_dataset_path, "train_val_test_dict.json")))
         self.compid_list = [compid_label[0] for compid_label in self.train_val_test_folds[train_val_test]]
         self.label_list = [compid_label[1] for compid_label in self.train_val_test_folds[train_val_test]]
@@ -533,8 +534,8 @@ class DEEPScreenDataset(Dataset):
             
         if not os.path.exists(img_path):
             raise FileNotFoundError(f"Image not found for compound ID: {comp_id}")
-
-        img_arr = cv2.imread(img_path)
+        img_arr = np.array(Image.open(img_path))
+        
         if img_arr is None:
             raise FileNotFoundError(f"Image not found or cannot be read: {img_path}")
 

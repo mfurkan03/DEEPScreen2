@@ -7,7 +7,7 @@ import warnings
 import numpy as np
 
 import torch.nn as nn
-from models import CNNModel1
+from models import CNNModel1, ViT
 
 from data_processing import get_train_test_val_data_loaders
 from evaluation_metrics import prec_rec_f1_acc_mcc, get_list_of_scores
@@ -129,6 +129,9 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     model = None
     if model_name == "CNNModel1":
         model = CNNModel1(fully_layer_1, fully_layer_2, drop_rate).to(device)
+    elif model_name == "ViT":
+        model = ViT(num_classes=2, drop_rate=drop_rate).to(device)
+
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = nn.CrossEntropyLoss()
     optimizer.zero_grad()
@@ -167,6 +170,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
             total_training_loss += float(loss.item())
             loss.backward()
             optimizer.step()
+            
         print("Epoch {} training loss:".format(epoch), total_training_loss)
         
         wandb.log({"Loss/train": total_training_loss, "epoch": epoch})
