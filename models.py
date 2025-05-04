@@ -60,6 +60,8 @@ class ViT(nn.Module):
         super(ViT, self).__init__()
 
         configuration = Swinv2Config()
+        configuration.hidden_size = 600
+        configuration.image_size = 300
         configuration.hidden_dropout_prob = drop_rate
         configuration.num_labels = num_classes
 
@@ -67,5 +69,5 @@ class ViT(nn.Module):
         self.vit = model
   
     def forward(self, x):
-        return self.vit(x)
+        return self.vit(x).logits
     
