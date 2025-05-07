@@ -121,7 +121,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
 
     if not os.path.exists(os.path.join(trained_models_path, experiment_name)):
         os.makedirs(os.path.join(trained_models_path, experiment_name))
-        
+
     best_val_test_result_fl = open(
         os.path.join(exp_path,"best_val_test_performance_results-"+str_arguments+".txt"), "w")
     best_val_test_prediction_fl = open(
@@ -135,6 +135,9 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     elif model_name == "ViT":
         model = ViT(num_classes=2, drop_rate=drop_rate).to(device)
 
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+    
     if model_save!="None":
         checkpoint = torch.load(model_save)
         model.load_state_dict(checkpoint['model_state_dict'])
@@ -142,7 +145,6 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         start_epoch = checkpoint['epoch'] + 1
         start_step = checkpoint['global_step'] + 1
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = nn.CrossEntropyLoss()
     optimizer.zero_grad()
 
