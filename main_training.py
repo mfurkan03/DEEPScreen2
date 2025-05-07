@@ -40,7 +40,7 @@ parser.add_argument(
     type=int,
     default=64,
     metavar='BS',
-    help='batch size (default: 32)')
+    help='batch size (default: 64)')
 parser.add_argument(
     '--dropout',
     type=float,
@@ -115,6 +115,17 @@ parser.add_argument(
     type=str,
     default='training_files/target_training_datasets',
     help='Path to training datasets directory (default: training_files/target_training_datasets)')
+parser.add_argument(
+    '--model_save',
+    type=str,
+    default=None,
+    help='Path to previous run if there exists one (default: None)')
+
+parser.add_argument(
+    '--run id',
+    type=str,
+    default=None,
+    help='Wandb Run ID if you want to continue a run (default: None)')
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -140,7 +151,7 @@ if __name__ == "__main__":
         args.pchembl_threshold)
     
     train_validation_test_training(args.target_chembl_id, args.model, args.fc1, args.fc2, args.lr, args.bs,
-                                   args.dropout, args.epoch, args.en, args.cuda)
+                                   args.dropout, args.epoch, args.en, args.cuda, args.model_save)
     
     
     

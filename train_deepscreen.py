@@ -45,8 +45,8 @@ def save_best_model_predictions(experiment_name, epoch, validation_scores_dict, 
         os.makedirs(os.path.join(trained_models_path, experiment_name))
 
     torch.save(model.state_dict(),
-               "{}/{}/{}_best_val-{}-state_dict.pth".format(trained_models_path, experiment_name,
-                                                                               target_id, str_arguments))
+               os.path.join(trained_models_path,experiment_name,target_id+"_best_val-"+str_arguments+"-state_dict.pth"))
+    
     str_test_predictions = "CompoundID\tLabel\tPred\n"
     for ind in range(len(all_test_comp_ids)):
         str_test_predictions += "{}\t{}\t{}\n".format(all_test_comp_ids[ind],
@@ -88,7 +88,7 @@ def calculate_val_test_loss(model, criterion, data_loader, device):
 
     return total_loss, total_count, all_comp_ids, all_labels, all_predictions,all_pred_probs
 
-def train_validation_test_training(target_id, model_name, fully_layer_1, fully_layer_2, learning_rate, batch_size, drop_rate, n_epoch, experiment_name, cuda_selection):
+def train_validation_test_training(target_id, model_name, fully_layer_1, fully_layer_2, learning_rate, batch_size, drop_rate, n_epoch, experiment_name, cuda_selection,run_id,model_save):
 
     arguments = ["{:.16f}".format(argm).rstrip('0') if type(argm)==float else str(argm) for argm in
                  [target_id, model_name, fully_layer_1, fully_layer_2, learning_rate, batch_size, drop_rate, n_epoch, experiment_name]]
@@ -100,7 +100,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     print("Arguments:", str_arguments)
     
 
-    wandb.init(project='my_project', name=experiment_name, config={
+    wandb.init(project='DeepscreenRuns', id = run_id,name=experiment_name,resume = 'allow', config={
         "target_id": target_id,
         "model_name": model_name,
         "fully_layer_1": fully_layer_1,
@@ -131,6 +131,13 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         model = CNNModel1(fully_layer_1, fully_layer_2, drop_rate).to(device)
     elif model_name == "ViT":
         model = ViT(num_classes=2, drop_rate=drop_rate).to(device)
+
+    if model_save:
+        checkpoint = torch.load(model_save)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        start_epoch = checkpoint['epoch'] + 1
+        start_step = checkpoint['global_step'] + 1
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = nn.CrossEntropyLoss()
@@ -198,6 +205,15 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
 
 
         model.eval()
+
+        # Save the model checkpoint to resume training later
+        torch.save({
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'steps': global_step,
+            }, os.path.join(project_file_path,experiment_name, target_id+"_"+ str_arguments+'-checkpoint.pth'))
+        
         with torch.no_grad():
             print("Validation mode:", not model.training)
 
@@ -241,7 +257,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
             if val_perf_dict["MCC"] > best_val_mcc_score:
                 best_val_mcc_score = val_perf_dict["MCC"]
                 best_test_mcc_score = test_perf_dict["MCC"]
-
+                
                 validation_scores_dict, best_test_performance_dict, best_test_predictions, str_test_predictions = save_best_model_predictions(
                     experiment_name, epoch, val_perf_dict, test_perf_dict,
                     model,project_file_path, target_id, str_arguments,
