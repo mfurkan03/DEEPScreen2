@@ -99,6 +99,8 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     str_arguments = "-".join(arguments)
     print("Arguments:", str_arguments)
     
+    if run_id =="None":
+        run_id = None
 
     wandb.init(project='DeepscreenRuns', id = run_id,name=experiment_name,resume = 'allow', config={
         "target_id": target_id,
@@ -120,9 +122,9 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         os.makedirs(exp_path)
 
     best_val_test_result_fl = open(
-        "{}/best_val_test_performance_results-{}.txt".format(exp_path,str_arguments), "w")
+        os.path.join(exp_path,"best_val_test_performance_results-",str_arguments+".txt"), "w")
     best_val_test_prediction_fl = open(
-        "{}/best_val_test_predictions-{}.txt".format(exp_path,str_arguments), "w")
+        os.path.join(exp_path,"best_val_test_predictions-",str_arguments+".txt"), "w")
 
     train_loader, valid_loader, test_loader = get_train_test_val_data_loaders(target_id, batch_size)
     
@@ -132,7 +134,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     elif model_name == "ViT":
         model = ViT(num_classes=2, drop_rate=drop_rate).to(device)
 
-    if model_save:
+    if model_save!="None":
         checkpoint = torch.load(model_save)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])

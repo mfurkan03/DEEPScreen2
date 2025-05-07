@@ -46,7 +46,7 @@ parser.add_argument(
     type=float,
     default=0.25,
     metavar='DO',
-    help='dropout rate (default: 0.25)')
+    help='dropout rate (default: 0.2)')
 parser.add_argument(
     '--epoch',
     type=int,
@@ -118,13 +118,13 @@ parser.add_argument(
 parser.add_argument(
     '--model_save',
     type=str,
-    default=None,
+    default="None",
     help='Path to previous run if there exists one (default: None)')
 
 parser.add_argument(
-    '--run id',
+    '--run_id',
     type=str,
-    default=None,
+    default="None",
     help='Wandb Run ID if you want to continue a run (default: None)')
 
 if __name__ == "__main__":
@@ -151,7 +151,7 @@ if __name__ == "__main__":
         args.pchembl_threshold)
     
     train_validation_test_training(args.target_chembl_id, args.model, args.fc1, args.fc2, args.lr, args.bs,
-                                   args.dropout, args.epoch, args.en, args.cuda, args.model_save)
+                                   args.dropout, args.epoch, args.en, args.cuda, args.run_id,args.model_save)
     
     
     
