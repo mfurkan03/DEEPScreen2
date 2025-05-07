@@ -41,8 +41,6 @@ trained_models_path = "{}/trained_models".format(project_file_path)
 def save_best_model_predictions(experiment_name, epoch, validation_scores_dict, test_scores_dict, model, project_file_path, target_id, str_arguments,
                                 all_test_comp_ids, test_labels, test_predictions):
 
-    if not os.path.exists(os.path.join(trained_models_path, experiment_name)):
-        os.makedirs(os.path.join(trained_models_path, experiment_name))
 
     torch.save(model.state_dict(),
                os.path.join(trained_models_path,experiment_name,target_id+"_best_val-"+str_arguments+"-state_dict.pth"))
@@ -121,6 +119,9 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     if not os.path.exists(exp_path):
         os.makedirs(exp_path)
 
+    if not os.path.exists(os.path.join(trained_models_path, experiment_name)):
+        os.makedirs(os.path.join(trained_models_path, experiment_name))
+        
     best_val_test_result_fl = open(
         os.path.join(exp_path,"best_val_test_performance_results-"+str_arguments+".txt"), "w")
     best_val_test_prediction_fl = open(
