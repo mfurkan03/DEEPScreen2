@@ -214,7 +214,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'steps': global_step,
-            }, os.path.join(project_file_path,experiment_name, target_id+"_"+ str_arguments+'-checkpoint.pth'))
+            }, os.path.join(trained_models_path,experiment_name, target_id+"_"+ str_arguments+'-checkpoint.pth'))
         
         with torch.no_grad():
             print("Validation mode:", not model.training)
