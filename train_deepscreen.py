@@ -122,9 +122,9 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         os.makedirs(exp_path)
 
     best_val_test_result_fl = open(
-        os.path.join(exp_path,"best_val_test_performance_results-",str_arguments+".txt"), "w")
+        os.path.join(exp_path,"best_val_test_performance_results-"+str_arguments+".txt"), "w")
     best_val_test_prediction_fl = open(
-        os.path.join(exp_path,"best_val_test_predictions-",str_arguments+".txt"), "w")
+        os.path.join(exp_path,"best_val_test_predictions-"+str_arguments+".txt"), "w")
 
     train_loader, valid_loader, test_loader = get_train_test_val_data_loaders(target_id, batch_size)
     
