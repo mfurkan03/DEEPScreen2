@@ -143,8 +143,11 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
-        start_step = checkpoint['global_step'] + 1
-
+        start_step = checkpoint['steps'] + 1
+    else:
+        start_epoch = 0
+        start_step = 0
+        
     criterion = nn.CrossEntropyLoss()
     optimizer.zero_grad()
 
@@ -152,9 +155,9 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
     best_val_test_performance_dict = dict()
     best_val_test_performance_dict["MCC"] = 0.0
 
-    global_step = 0  # Track steps across all epochs
-
-    for epoch in range(n_epoch):
+    global_step = start_step  # Track steps across all epochs
+    for e in range(n_epoch):
+        epoch = e + start_epoch
         total_training_count = 0
         total_training_loss = 0.0
         print("Epoch :{}".format(epoch))
