@@ -19,6 +19,10 @@ import csv
 from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 from chemprop.data import make_split_indices
 
+#####################################################
+random.seed(42)  # Very important for reproducibility
+#####################################################
+
 warnings.filterwarnings(action='ignore')
 current_path_beginning = os.getcwd().split("DEEPScreen")[0]
 current_path_version = os.getcwd().split("DEEPScreen")[1].split(os.sep)[0]
@@ -57,16 +61,21 @@ def save_comp_imgs_from_smiles(tar_id, comp_id, smiles, rotations, target_predic
         os.makedirs(base_path)
 
     try:
+        rotations_to_add = []
+        for rot, suffix in rotations:
+            if os.path.exists(os.path.join(base_path, f"{comp_id}{suffix}.png")): # Don't recreate images already done
+                continue
+            else:
+                rotations_to_add.append((rot, suffix))
+        if len(rotations_to_add) == 0:
+            return
         
         image = Draw.MolToImage(mol, size=(SIZE, SIZE))
         image_array = np.array(image)
         image_bgr = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
         
-        for rot, suffix in rotations:
+        for rot, suffix in rotations_to_add:
 
-            if os.path.exists(os.path.join(base_path, f"{comp_id}{suffix}.png")): # Don't recreate images already done
-                continue
-            
             if rot != 0:
                 full_image = np.full((rot_size, rot_size, 3), (255, 255, 255), dtype=np.uint8)
                 gap = rot_size - SIZE
