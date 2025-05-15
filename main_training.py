@@ -73,7 +73,7 @@ parser.add_argument(
 parser.add_argument(
     '--pchembl_threshold',
     type=float,  #
-    default=5.8,   
+    default=6,   
     metavar='DPT',
     help='The threshold for the number of data points to be used (default: 6)')
 parser.add_argument(
