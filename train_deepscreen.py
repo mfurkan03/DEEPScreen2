@@ -112,7 +112,7 @@ def train_validation_test_training(target_id, model_name, fully_layer_1, fully_l
         "cuda_selection": get_device(cuda_selection)
     })
 
-
+    os.environ['CUDA_VISIBLE_DEVICES'] = cuda_selection
     device = get_device(cuda_selection)
     exp_path = os.path.join(result_files_path, "experiments", experiment_name)
 
